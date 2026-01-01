@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>My Teaching Journal</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+    body {
+        font-family: "Segoe UI", sans-serif;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        justify-content: center;
+        padding: 30px;
+    }
+
+    .container {
+        background: #ffffff;
+        width: 800px;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+        text-align: center;
+        color: #4b3f72;
+        margin-bottom: 10px;
+    }
+
+    .date-box {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    input[type="date"] {
+        padding: 8px;
+        font-size: 16px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+
+    .tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+
+    .tab {
+        padding: 10px 15px;
+        border-radius: 20px;
+        background: #e0e7ff;
+        cursor: pointer;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .tab.active {
+        background: #667eea;
+        color: white;
+    }
+
+    .content {
+        display: none;
+    }
+
+    .content.active {
+        display: block;
+    }
+
+    textarea {
+        width: 100%;
+        height: 180px;
+        padding: 15px;
+        font-size: 15px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        background: #fffdf5;
+        line-height: 1.6;
+    }
+
+    button {
+        width: 100%;
+        margin-top: 20px;
+        padding: 14px;
+        font-size: 17px;
+        background: linear-gradient(90deg, #43cea2, #185a9d);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        opacity: 0.9;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📔 My Daily Teaching Journal</h2>
+
+    <div class="date-box">
+        <label><b>Select Date:</b></label>
+        <input type="date" id="journalDate">
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <div class="tab active" onclick="openTab(0)">📘 Lecture 1</div>
+        <div class="tab" onclick="openTab(1)">📗 Lecture 2</div>
+        <div class="tab" onclick="openTab(2)">📕 Lecture 3</div>
+        <div class="tab" onclick="openTab(3)">📙 Lecture 4</div>
+        <div class="tab" onclick="openTab(4)">📓 Lecture 5</div>
+        <div class="tab" onclick="openTab(5)">🛠 Extra Work</div>
+        <div class="tab" onclick="openTab(6)">✅ Upcoming Tasks</div>
+    </div>
+
+    <!-- Content Areas -->
+    <div class="content active"><textarea id="l1" placeholder="What did you teach in Lecture 1?"></textarea></div>
+    <div class="content"><textarea id="l2" placeholder="What did you teach in Lecture 2?"></textarea></div>
+    <div class="content"><textarea id="l3" placeholder="What did you teach in Lecture 3?"></textarea></div>
+    <div class="content"><textarea id="l4" placeholder="What did you teach in Lecture 4?"></textarea></div>
+    <div class="content"><textarea id="l5" placeholder="What did you teach in Lecture 5?"></textarea></div>
+    <div class="content"><textarea id="extra" placeholder="Meetings, workshops, corrections, admin work..."></textarea></div>
+    <div class="content"><textarea id="tasks" placeholder="Tasks to do in upcoming days..."></textarea></div>
+
+    <button onclick="savePDF()">Save Journal as PDF</button>
+</div>
+
+<script>
+    function openTab(index) {
+        const tabs = document.querySelectorAll(".tab");
+        const contents = document.querySelectorAll(".content");
+
+        tabs.forEach(tab => tab.classList.remove("active"));
+        contents.forEach(content => content.classList.remove("active"));
+
+        tabs[index].classList.add("active");
+        contents[index].classList.add("active");
+    }
+
+    function savePDF() {
+        const { jsPDF } = window.jspdf;
+        const date = document.getElementById("journalDate").value;
+
+        if (!date) {
+            alert("Please select a date!");
+            return;
+        }
+
+        const pdf = new jsPDF();
+        let y = 15;
+
+        pdf.setFontSize(14);
+        pdf.text(`Teaching Journal - ${date}`, 10, y);
+        y += 10;
+
+        const sections = [
+            ["Lecture 1", "l1"],
+            ["Lecture 2", "l2"],
+            ["Lecture 3", "l3"],
+            ["Lecture 4", "l4"],
+            ["Lecture 5", "l5"],
+            ["Extra Work", "extra"],
+            ["Upcoming Tasks", "tasks"]
+        ];
+
+        pdf.setFontSize(12);
+
+        sections.forEach(section => {
+            const text = document.getElementById(section[1]).value;
+            if (text.trim() !== "") {
+                pdf.text(section[0] + ":", 10, y);
+                y += 6;
+                const lines = pdf.splitTextToSize(text, 180);
+                pdf.text(lines, 10, y);
+                y += lines.length * 6 + 5;
+            }
+        });
+
+        pdf.save(`Teaching_Journal_${date}.pdf`);
+    }
+</script>
+
+</body>
+</html>
